@@ -7,13 +7,23 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from './entities';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Public } from 'src/decorators/public.decorator';
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -21,6 +31,7 @@ export class UsersController {
 
   @ApiCreatedResponse({ type: User })
   @UsePipes(ValidationPipe)
+  @Public()
   @Post()
   async createUser(@Body() data: UpdateUserDto): Promise<User> {
     return await this.usersService.createUser(data);

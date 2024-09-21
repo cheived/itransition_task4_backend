@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -12,7 +13,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -33,7 +34,7 @@ export class UsersController {
   @UsePipes(ValidationPipe)
   @Public()
   @Post()
-  async createUser(@Body() data: UpdateUserDto): Promise<User> {
+  async createUser(@Body() data: CreateUserDto): Promise<User> {
     return await this.usersService.createUser(data);
   }
 
@@ -51,7 +52,7 @@ export class UsersController {
 
   @ApiOkResponse({ type: User })
   @UsePipes(ValidationPipe)
-  @Put()
+  @Put(':/id')
   async updateUser(@Body() data: UpdateUserDto): Promise<User> {
     return await this.usersService.updateUser(data);
   }
@@ -60,5 +61,15 @@ export class UsersController {
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return await this.usersService.deleteUser(id);
+  }
+
+  @Delete()
+  async deleteManyUsers(@Body() usersId: number[]) {
+    return await this.usersService.deleteManyUsers(usersId);
+  }
+
+  @Patch()
+  async changeUsersStatus(@Body() body: { ids: number[]; status: boolean }) {
+    return await this.usersService.changeUsersStatus(body.ids, body.status);
   }
 }

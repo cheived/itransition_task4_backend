@@ -24,11 +24,9 @@ export class UpdateUserDto {
 
   @ApiProperty()
   @IsBoolean()
-  @IsNotEmpty()
   active: boolean;
 
   @ApiProperty()
   @IsDateString()
-  @IsNotEmpty()
   lastLogin: Date;
 }

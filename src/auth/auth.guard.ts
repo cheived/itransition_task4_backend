@@ -44,8 +44,12 @@ export class AuthGuard implements CanActivate {
     }
 
     const user = await this.usersService.readUser(payload.sub);
-    if (!user.active) {
+    if (!user?.active) {
       throw new UnauthorizedException('Your account is inactive');
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('Account not found');
     }
 
     return true;

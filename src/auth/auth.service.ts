@@ -16,9 +16,14 @@ export class AuthService {
   async signIn(email: string, pass: string): Promise<{ access_token: string }> {
     const user = await this.usersService.findUserByEmail(email);
     if (user?.password !== pass) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Something wrong');
+    }
+
+    if (!user?.active) {
+      throw new UnauthorizedException('Account disabled');
     }
     const payload = { sub: user.id, email: user.email };
+    await this.usersService.updateUser({ ...user, lastLogin: new Date() });
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

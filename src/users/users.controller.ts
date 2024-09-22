@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Put,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -29,6 +31,11 @@ import { Public } from 'src/decorators/public.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('profile')
+  getProfile(@Req() request: Request) {
+    return request['user'];
+  }
 
   @ApiCreatedResponse({ type: User })
   @UsePipes(ValidationPipe)
@@ -52,7 +59,7 @@ export class UsersController {
 
   @ApiOkResponse({ type: User })
   @UsePipes(ValidationPipe)
-  @Put(':/id')
+  @Put(':id')
   async updateUser(@Body() data: UpdateUserDto): Promise<User> {
     return await this.usersService.updateUser(data);
   }
@@ -68,8 +75,13 @@ export class UsersController {
     return await this.usersService.deleteManyUsers(usersId);
   }
 
-  @Patch()
-  async changeUsersStatus(@Body() body: { ids: number[]; status: boolean }) {
-    return await this.usersService.changeUsersStatus(body.ids, body.status);
+  @Patch('/activate')
+  async activateUsers(@Body() usersId: number[]) {
+    return await this.usersService.changeUsersStatus(usersId, true);
+  }
+
+  @Patch('/deactivate')
+  async deactivateUsers(@Body() usersId: number[]) {
+    return await this.usersService.changeUsersStatus(usersId, false);
   }
 }
